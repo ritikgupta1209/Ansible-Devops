@@ -1,0 +1,35 @@
+::To create ansible master node at virtual box and ec2 instance as target node:
+
+1> create ec2 instance with key-value pair
+
+2> open the Linux separate terminal  other than ansible master node to configure the ssh connection
+
+3> First change the permission of privatekey.pem file
+	chmod 400 privatekey.pem
+
+4> Run the command to connect to your EC2 instance
+	ssh -i /path-to-the-private-key/privatekey.pem ubuntu@public-ip
+	ssh -i ~/Downloads/privatekey.pem ubuntu@public-ip
+
+5> Setup for ansible (passwordless authentication) 
+  
+ a> Generate public key first on master node. This will generate the public  key in "~/.ssh" location as id_rsa.pub
+     ssh-keygen -t rsa
+
+  
+ b> on master node copy the public  key to your target ec2 instance 
+     ssh-copy-id -i ~/.ssh/id_rsa.pub ubuntu@public-ip
+
+				OR 
+
+  If option b doesn't works  out  then we can copy te content of id_rsa.pub key and paste it at the target location.
+        1> ssh ubuntu@public-ip
+	2> vim ~/.ssh/authorized_keys  >> paste the public key content 
+
+
+6> Now run some adhoc command on master node
+	ansible -i inventory_name hosts_name_OR_all -m modulename "command you want to push"
+	ansible -i inventory.ini webservers -m shell " touch ~/myfile.txt "
+
+7> Ansible playbook syntax
+	ansible-playbook -i inventory.ini webservers playbook_name.yaml
